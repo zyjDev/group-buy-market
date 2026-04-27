@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/group-buy-market-zyj-api/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/group-buy-market-zyj-api/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/group-buy-market-zyj-app/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/group-buy-market-zyj-app/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/group-buy-market-zyj-domain/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/group-buy-market-zyj-domain/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/group-buy-market-zyj-infrastructure/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/group-buy-market-zyj-infrastructure/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/group-buy-market-zyj-trigger/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/group-buy-market-zyj-trigger/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/group-buy-market-zyj-types/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/group-buy-market-zyj-types/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />
+  </component>
+</project>
