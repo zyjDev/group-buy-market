@@ -67,3 +67,10 @@ group-buy-market-app/src/main/resources/application-dev.yml
 .env
 *.env
 *-secret.yml
+
+### 本地交接文档（仅本机查看，不推送到远程）###
+HANDOVER.md
+*.local.md
+
+### IDE 配置备份目录（含数据源与本地凭据，不提交）###
+.idea.bak*/

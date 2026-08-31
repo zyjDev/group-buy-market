@@ -116,7 +116,8 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.6</version>
                 <configuration>
-                    <skipTests>true</skipTests>
+                    <!-- 默认跳过测试；需要跑测试时用 -DskipTests=false 覆盖 -->
+                    <skipTests>${skipTests}</skipTests>
                     <testFailureIgnore>false</testFailureIgnore>
                     <includes>
                         <include>**/*Test.java</include>
