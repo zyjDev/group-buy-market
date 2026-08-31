@@ -1,5 +1,5 @@
-CONTAINER_NAME=group-buy-market-zyj
-IMAGE_NAME=system/group-buy-market-zyj:1.0-SNAPSHOT
+CONTAINER_NAME=group-buy-market
+IMAGE_NAME=system/group-buy-market:1.0-SNAPSHOT
 PORT=8091
 
 echo "容器部署开始 ${CONTAINER_NAME}"

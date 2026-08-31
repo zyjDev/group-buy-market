@@ -1,5 +1,0 @@
-spring:
-  config:
-    name: group-buy-market-zyj-app
-  profiles:
-    active: dev

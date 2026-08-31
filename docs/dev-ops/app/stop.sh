@@ -1,1 +1,1 @@
-docker stop group-buy-market-zyj
+docker stop group-buy-market

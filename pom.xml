@@ -3,17 +3,17 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>cn.bugstack</groupId>
-    <artifactId>group-buy-market-zyj</artifactId>
+    <artifactId>group-buy-market</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
-        <module>group-buy-market-zyj-api</module>
-        <module>group-buy-market-zyj-app</module>
-        <module>group-buy-market-zyj-domain</module>
-        <module>group-buy-market-zyj-trigger</module>
-        <module>group-buy-market-zyj-infrastructure</module>
-        <module>group-buy-market-zyj-types</module>
+        <module>group-buy-market-api</module>
+        <module>group-buy-market-app</module>
+        <module>group-buy-market-domain</module>
+        <module>group-buy-market-trigger</module>
+        <module>group-buy-market-infrastructure</module>
+        <module>group-buy-market-types</module>
     </modules>
 
     <repositories>
@@ -119,27 +119,27 @@
             <!-- 工程模块 -->
             <dependency>
                 <groupId>cn.bugstack</groupId>
-                <artifactId>group-buy-market-zyj-api</artifactId>
+                <artifactId>group-buy-market-api</artifactId>
                 <version>1.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>cn.bugstack</groupId>
-                <artifactId>group-buy-market-zyj-domain</artifactId>
+                <artifactId>group-buy-market-domain</artifactId>
                 <version>1.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>cn.bugstack</groupId>
-                <artifactId>group-buy-market-zyj-infrastructure</artifactId>
+                <artifactId>group-buy-market-infrastructure</artifactId>
                 <version>1.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>cn.bugstack</groupId>
-                <artifactId>group-buy-market-zyj-types</artifactId>
+                <artifactId>group-buy-market-types</artifactId>
                 <version>1.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>cn.bugstack</groupId>
-                <artifactId>group-buy-market-zyj-trigger</artifactId>
+                <artifactId>group-buy-market-trigger</artifactId>
                 <version>1.0-SNAPSHOT</version>
             </dependency>
         </dependencies>
@@ -180,21 +180,21 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <java_jvm>-Xms1G -Xmx1G -server  -XX:MaxPermSize=256M -Xss256K -Dspring.profiles.active=test -XX:+DisableExplicitGC -XX:+UseG1GC  -XX:LargePageSizeInBytes=128m -XX:+UseFastAccessorMethods -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/export/Logs/group-buy-market-zyj-boot -Xloggc:/export/Logs/group-buy-market-zyj-boot/gc-group-buy-market-zyj-boot.log -XX:+PrintGCDetails -XX:+PrintGCDateStamps</java_jvm>
+                <java_jvm>-Xms1G -Xmx1G -server  -XX:MaxPermSize=256M -Xss256K -Dspring.profiles.active=test -XX:+DisableExplicitGC -XX:+UseG1GC  -XX:LargePageSizeInBytes=128m -XX:+UseFastAccessorMethods -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/export/Logs/group-buy-market-boot -Xloggc:/export/Logs/group-buy-market-boot/gc-group-buy-market-boot.log -XX:+PrintGCDetails -XX:+PrintGCDateStamps</java_jvm>
                 <profileActive>dev</profileActive>
             </properties>
         </profile>
         <profile>
             <id>test</id>
             <properties>
-                <java_jvm>-Xms1G -Xmx1G -server  -XX:MaxPermSize=256M -Xss256K -Dspring.profiles.active=test -XX:+DisableExplicitGC -XX:+UseG1GC  -XX:LargePageSizeInBytes=128m -XX:+UseFastAccessorMethods -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/export/Logs/group-buy-market-zyj-boot -Xloggc:/export/Logs/group-buy-market-zyj-boot/gc-group-buy-market-zyj-boot.log -XX:+PrintGCDetails -XX:+PrintGCDateStamps</java_jvm>
+                <java_jvm>-Xms1G -Xmx1G -server  -XX:MaxPermSize=256M -Xss256K -Dspring.profiles.active=test -XX:+DisableExplicitGC -XX:+UseG1GC  -XX:LargePageSizeInBytes=128m -XX:+UseFastAccessorMethods -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/export/Logs/group-buy-market-boot -Xloggc:/export/Logs/group-buy-market-boot/gc-group-buy-market-boot.log -XX:+PrintGCDetails -XX:+PrintGCDateStamps</java_jvm>
                 <profileActive>test</profileActive>
             </properties>
         </profile>
         <profile>
             <id>prod</id>
             <properties>
-                <java_jvm>-Xms6G -Xmx6G -server  -XX:MaxPermSize=256M -Xss256K -Dspring.profiles.active=release -XX:+DisableExplicitGC -XX:+UseG1GC  -XX:LargePageSizeInBytes=128m -XX:+UseFastAccessorMethods -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/export/Logs/fq-mall-activity-app -Xloggc:/export/Logs/group-buy-market-zyj-boot/gc-group-buy-market-zyj-boot.log -XX:+PrintGCDetails -XX:+PrintGCDateStamps</java_jvm>
+                <java_jvm>-Xms6G -Xmx6G -server  -XX:MaxPermSize=256M -Xss256K -Dspring.profiles.active=release -XX:+DisableExplicitGC -XX:+UseG1GC  -XX:LargePageSizeInBytes=128m -XX:+UseFastAccessorMethods -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/export/Logs/fq-mall-activity-app -Xloggc:/export/Logs/group-buy-market-boot/gc-group-buy-market-boot.log -XX:+PrintGCDetails -XX:+PrintGCDateStamps</java_jvm>
                 <profileActive>prod</profileActive>
             </properties>
         </profile>
