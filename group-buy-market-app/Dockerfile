@@ -1,9 +1,6 @@
 # 基础镜像
 FROM openjdk:8-jre-slim
 
-# 作者
-LABEL maintainer="group-buy-market"
-
 # 配置
 ENV PARAMS=""
 
