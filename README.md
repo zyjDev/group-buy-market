@@ -170,7 +170,7 @@ mvn test -pl group-buy-market-app -am \
   -Dtest=GroupBuyActivityDaoTest,GroupBuyDiscountDaoTest
 ```
 
-测试位于 `group-buy-market-app/src/test/java/cn/bugstack/test/infrastructure/dao/`，会打印两张表的查询结果。
+测试位于 `group-buy-market-app/src/test/java/com/groupbuy/market/test/infrastructure/dao/`，会打印两张表的查询结果。
 
 > 工程默认跳过单元测试（根 pom 的 `skipTests` 默认为 `true`），跑测试时需显式加 `-DskipTests=false`。也可以直接在 IDEA 中右键运行这两个测试类。
 
@@ -231,10 +231,7 @@ mvn() {
 
 ## 参考与致谢
 
-本项目学习并实践自 [小傅哥 bugstack](https://github.com/fuzhengwei) 的《拼团营销系统》DDD 教程，工程脚手架基于其 `xfg-frame-archetype`。感谢原作者的开源分享。
 
-- DDD 教程：[https://bugstack.cn/md/road-map/ddd.html](https://bugstack.cn/md/road-map/ddd.html)
-- 原仓库：[https://github.com/fuzhengwei/group-buy-market](https://github.com/fuzhengwei/group-buy-market)
 
 ## License
 

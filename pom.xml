@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>cn.bugstack</groupId>
+    <groupId>com.groupbuy.market</groupId>
     <artifactId>group-buy-market</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
@@ -39,15 +39,6 @@
         <!-- 默认跳过单元测试；执行 mvn test -DskipTests=false 可开启 -->
         <skipTests>true</skipTests>
     </properties>
-
-    <developers>
-        <developer>
-            <name>xiaofuge</name>
-            <email>184172133@qq.com</email>
-            <organization>fuzhengwei</organization>
-            <organizationUrl>https://github.com/fuzhengwei</organizationUrl>
-        </developer>
-    </developers>
 
     <licenses>
         <license>
@@ -118,29 +109,55 @@
                 <version>1.15</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.redisson</groupId>
+                <artifactId>redisson-spring-boot-starter</artifactId>
+                <version>3.26.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>okhttp-sse</artifactId>
+                <version>3.14.9</version>
+            </dependency>
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>logging-interceptor</artifactId>
+                <version>3.14.9</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-amqp</artifactId>
+                <version>2.7.12</version>
+            </dependency>
+            <dependency>
+                <groupId>net.logstash.logback</groupId>
+                <artifactId>logstash-logback-encoder</artifactId>
+                <version>7.3</version>
+            </dependency>
+
             <!-- 工程模块 -->
             <dependency>
-                <groupId>cn.bugstack</groupId>
+                <groupId>com.groupbuy.market</groupId>
                 <artifactId>group-buy-market-api</artifactId>
                 <version>1.0-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>cn.bugstack</groupId>
+                <groupId>com.groupbuy.market</groupId>
                 <artifactId>group-buy-market-domain</artifactId>
                 <version>1.0-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>cn.bugstack</groupId>
+                <groupId>com.groupbuy.market</groupId>
                 <artifactId>group-buy-market-infrastructure</artifactId>
                 <version>1.0-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>cn.bugstack</groupId>
+                <groupId>com.groupbuy.market</groupId>
                 <artifactId>group-buy-market-types</artifactId>
                 <version>1.0-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>cn.bugstack</groupId>
+                <groupId>com.groupbuy.market</groupId>
                 <artifactId>group-buy-market-trigger</artifactId>
                 <version>1.0-SNAPSHOT</version>
             </dependency>
