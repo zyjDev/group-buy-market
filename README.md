@@ -2,239 +2,281 @@
 
 <div align="center">
 
-![JDK](https://img.shields.io/badge/JDK-8-007396?logo=openjdk&logoColor=white)
+![JDK](https://img.shields.io/badge/JDK-8%20%7C%2017%20%7C%2021-007396?logo=openjdk&logoColor=white)
 ![SpringBoot](https://img.shields.io/badge/Spring%20Boot-2.7.12-6DB33F?logo=springboot&logoColor=white)
 ![MyBatis](https://img.shields.io/badge/MyBatis-2.1.4-FE4648)
 ![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?logo=mysql&logoColor=white)
+![Redis](https://img.shields.io/badge/Redis-6.2-DC382D?logo=redis&logoColor=white)
+![RabbitMQ](https://img.shields.io/badge/RabbitMQ-3.12-FF6600?logo=rabbitmq&logoColor=white)
 ![DDD](https://img.shields.io/badge/Architecture-DDD-blue)
-![License](https://img.shields.io/badge/License-Apache%202.0-green)
 
-基于 **DDD 分层架构**的拼团营销系统，覆盖优惠试算、锁单成团、退单解锁的完整营销链路。
+基于 DDD 分层架构的拼团营销系统，覆盖营销试算、锁单、成团结算、退款和库存恢复完整链路。
 
 </div>
 
----
+## 项目功能
 
-## 项目简介
-
-拼团是电商营销中最典型的玩法之一：用户开团后邀请他人参团，达到目标人数即成团并享受优惠价，未成团则自动退款。本项目以此为业务背景，用 **DDD（领域驱动设计）四层架构**搭建一套可演进的营销系统，把「优惠试算」「成团判定」「库存锁定」这些核心规则收敛在领域层，而不是散落在 Controller 和 SQL 里。
-
-> 本项目为学习实践性质，非生产级系统。教程出处与致谢见文末。
-
-## 当前进度
-
-| 层次 | 内容 | 状态 |
-| --- | --- | --- |
-| 工程骨架 | 六模块 DDD 分层、统一响应体、异常枚举、线程池配置 | ✅ 已完成 |
-| 数据层 | `group_buy_activity` / `group_buy_discount` 两张表及对应 DAO、PO、Mapper | ✅ 已完成 |
-| 触发层 | `trigger` 模块（http / job / listener） | 🚧 占位，尚未实现 Controller |
-| 领域层 | `domain` 模块（model / service / adapter） | 🚧 占位，尚未实现领域模型 |
-| 业务链路 | 优惠试算、锁单成团、退单解锁 | ⬜ 待开发 |
-
-当前阶段**还没有任何 HTTP 接口**，应用能正常启动即代表工程跑通；数据层可通过两个 DAO 测试类验证。
+- 拼团活动、折扣、商品和渠道关系查询
+- 人群标签可见性与参与资格校验
+- 直减、满减、折扣、N 元购优惠试算
+- 新团创建、已有团参团、用户参与次数限制
+- Redis 库存占用与支付结果幂等
+- 拼团进度统计和成团结算
+- 未支付、已支付未成团、已支付已成团三种退款类型
+- HTTP/MQ 成团通知、本地消息任务和失败补偿
+- 超时未支付订单扫描与自动退单
+- DCC 动态开关：降级、切量和限流
+- Guava 限流、TraceId、Prometheus/Grafana 相关配置
 
 ## 技术栈
 
-| 组件 | 版本 | 说明 |
+| 组件 | 版本 | 用途 |
 | --- | --- | --- |
-| JDK | 8 | 编译与运行均须 JDK 8，见下方注意事项 |
-| Spring Boot | 2.7.12 | 基础框架 |
-| MyBatis | 2.1.4 | ORM，XML 方式管理 SQL |
-| MySQL Connector | 8.0.22 | 数据库驱动 |
-| Guava | 32.1.3-jre | 本地缓存、工具类 |
+| JDK | 8+ | 源码与字节码目标为 Java 8，可使用 JDK 8、17 或 21 构建 |
+| Maven | 3.9+ | 多模块构建 |
+| Spring Boot | 2.7.12 | Web、配置、任务和依赖装配 |
+| MyBatis | 2.1.4 | DAO 与 XML SQL 映射 |
+| MySQL | 8.0 | 活动、订单、任务和标签数据 |
+| Redis / Redisson | 6.2 / 3.26.0 | 分布式锁、库存、缓存和 DCC |
+| RabbitMQ | 3.12 | 成团与退款异步通知 |
+| OkHttp | 3.14.9 | HTTP 回调 |
 | Fastjson | 2.0.28 | JSON 序列化 |
-| Lombok | — | 简化 PO / 枚举代码 |
-| Maven | 3.9+ | 构建工具 |
+| Guava | 32.1.3-jre | 本地缓存和限流 |
+| Logstash | 可选 | 日志采集 |
 
-## 工程结构
+## 模块结构
 
-采用 DDD 四层架构，依赖方向自上而下单向收敛：
-
-```
+```text
 group-buy-market/
-├── group-buy-market-api              # 接口层：对外 DTO、统一响应体 Response
-├── group-buy-market-trigger          # 触发层：HTTP 接口、定时任务、消息监听（占位）
-├── group-buy-market-domain           # 领域层：聚合、实体、值对象、领域服务（占位）
-├── group-buy-market-infrastructure   # 基础设施层：DAO、PO、外部服务网关、Redis（部分占位）
-├── group-buy-market-types            # 通用层：常量、枚举、自定义异常
-└── group-buy-market-app              # 启动层：启动类、配置、Mapper XML、日志
+├── group-buy-market-api
+│   └── 对外 DTO、服务接口、统一 Response
+├── group-buy-market-types
+│   └── 通用枚举、异常、常量
+├── group-buy-market-domain
+│   └── 活动、标签、交易领域模型与领域服务
+├── group-buy-market-infrastructure
+│   └── DAO、Repository、Redis、网关和事件发布实现
+├── group-buy-market-trigger
+│   └── HTTP Controller、定时任务、MQ Listener
+└── group-buy-market-app
+    └── 启动类、环境配置、线程池、日志、Mapper XML
 ```
 
-各模块职责与依赖关系：
+依赖方向：
 
-| 模块 | 职责 | 依赖 |
+```text
+app -> trigger -> domain -> types
+          |
+          +-> infrastructure -> domain
+```
+
+`domain` 只定义 Repository/Port 接口，`infrastructure` 提供实现，业务规则不直接依赖数据库和 Redis 细节。
+
+## 核心链路
+
+### 1. 营销试算
+
+`IndexGroupBuyMarketServiceImpl` 通过责任链和异步节点加载活动、折扣、SKU、拼团数据，计算原价、优惠金额、实付金额以及用户可见/可参与状态。
+
+### 2. 锁单
+
+`TradeLockOrderService` 依次执行活动可用性、用户参与次数、组队库存规则，然后创建或加入 `group_buy_order`，写入 `group_buy_order_list`，并使用 Redis 原子占用库存。
+
+### 3. 支付结算
+
+`TradeSettlementOrderService` 校验外部交易单号、SC 黑名单、拼团有效时间和订单状态，更新订单为已完成并推进拼团进度。团队达标后生成本地通知任务并投递 HTTP 或 RabbitMQ 消息。
+
+### 4. 退款和库存恢复
+
+`TradeRefundOrderService` 根据“订单状态 + 团队状态”选择退款策略：
+
+| 场景 | 策略 | 处理 |
 | --- | --- | --- |
-| `api` | 定义对外契约（DTO、响应体），不含业务逻辑 | `types` |
-| `trigger` | 接收外部请求，做参数校验与协议转换后调用领域层 | `api`、`domain`、`types` |
-| `domain` | 核心业务规则所在，通过 `adapter/port` 反向依赖基础设施 | `types` |
-| `infrastructure` | 数据库访问、缓存、外部接口调用，实现领域层定义的端口 | `domain` |
-| `types` | 全局常量、响应码枚举、异常定义，无业务依赖 | — |
-| `app` | 装配各层、Spring Boot 启动入口、环境配置 | `trigger`、`infrastructure` |
+| 未支付、未成团 | `unpaid_unlock` | 关闭订单、释放锁单量 |
+| 已支付、未成团 | `paid_unformed` | 退款、释放锁单和完成量 |
+| 已支付、已成团 | `paid_formed` | 退款、维护成团状态并通知业务 |
 
-## 数据模型
+退款完成后通过 MQ 消费结果恢复 Redis 团队库存。
 
-两张配置表，均位于 `docs/dev-ops/mysql/sql/group_buy_market.sql`。
+## 数据表
 
-**`group_buy_activity` 拼团活动配置**
+初始化脚本位于 `docs/dev-ops/mysql/sql/2-29-group_buy_market.sql`，共 10 张表：
 
-| 字段 | 类型 | 说明 |
+| 表 | 用途 |
+| --- | --- |
+| `group_buy_activity` | 拼团活动配置 |
+| `group_buy_discount` | 优惠折扣配置 |
+| `group_buy_order` | 团队维度拼团订单 |
+| `group_buy_order_list` | 用户订单明细 |
+| `sc_sku_activity` | 渠道、商品与活动关系 |
+| `sku` | 商品信息 |
+| `crowd_tags` | 人群标签 |
+| `crowd_tags_detail` | 人群标签明细 |
+| `crowd_tags_job` | 人群计算任务 |
+| `notify_task` | 本地消息和失败补偿任务 |
+
+## HTTP 接口
+
+服务默认端口为 `8091`。
+
+| 方法 | 路径 | 说明 |
 | --- | --- | --- |
-| `activity_id` | bigint | 活动 ID（唯一） |
-| `activity_name` | varchar | 活动名称 |
-| `source` / `channel` | varchar | 来源 / 渠道，用于区分流量入口 |
-| `goods_id` | varchar | 参与拼团的商品 ID |
-| `discount_id` | varchar | 关联的折扣配置 ID |
-| `group_type` | tinyint | 拼团方式：0 自动成团、1 达成目标拼团 |
-| `take_limit_count` | int | 单人参与次数限制 |
-| `target` | int | 成团目标人数 |
-| `valid_time` | int | 拼团时长（分钟） |
-| `status` | tinyint | 活动状态：0 创建、1 生效、2 过期、3 废弃 |
-| `tag_id` / `tag_scope` | varchar | 人群标签规则，用于限定可见 / 可参与人群 |
+| POST | `/api/v1/gbm/index/query_group_buy_market_config` | 查询营销配置和优惠试算 |
+| POST | `/api/v1/gbm/trade/lock_market_pay_order` | 创建或加入拼团并锁定库存 |
+| POST | `/api/v1/gbm/trade/settlement_market_pay_order` | 支付成功结算 |
+| POST | `/api/v1/gbm/trade/refund_market_pay_order` | 退款、退单和库存恢复 |
+| GET | `/api/v1/gbm/dcc/update_config` | 动态修改配置 |
+| POST | `/api/v1/test/group_buy_notify` | 本地 HTTP 回调测试接口 |
 
-**`group_buy_discount` 折扣配置**
+示例请求：
 
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| `discount_id` | int | 折扣 ID（唯一） |
-| `discount_name` / `discount_desc` | varchar | 折扣标题与描述 |
-| `discount_type` | tinyint | 折扣类型：0 base、1 tag |
-| `market_plan` | varchar | 营销优惠计划：ZJ 直减、MJ 满减、N 元购 |
-| `market_expr` | varchar | 优惠表达式，如 `20` 表示直减 20 元 |
-| `tag_id` | varchar | 人群标签，限定特定人群可享 |
+```json
+POST /api/v1/gbm/index/query_group_buy_market_config
+{
+  "userId": "GROUP_BUY01",
+  "source": "s01",
+  "channel": "c01",
+  "goodsId": "9890001"
+}
+```
 
-## 快速开始
+```json
+POST /api/v1/gbm/trade/lock_market_pay_order
+{
+  "userId": "user01",
+  "teamId": null,
+  "activityId": 100123,
+  "goodsId": "9890001",
+  "source": "s01",
+  "channel": "c01",
+  "outTradeNo": "202609130001",
+  "notifyConfigVO": {
+    "notifyType": "MQ"
+  }
+}
+```
+
+`notifyConfigVO.notifyType` 支持 `MQ` 和 `HTTP`；使用 `HTTP` 时必须提供 `notifyUrl`。
+
+```json
+POST /api/v1/gbm/trade/settlement_market_pay_order
+{
+  "userId": "GROUP_BUY03",
+  "source": "s01",
+  "channel": "c01",
+  "outTradeNo": "769515763172",
+  "outTradeTime": "2025-04-05T14:55:00+08:00"
+}
+```
+
+```json
+POST /api/v1/gbm/trade/refund_market_pay_order
+{
+  "userId": "GROUP_BUY05",
+  "source": "s01",
+  "channel": "c01",
+  "outTradeNo": "946916695095"
+}
+```
+
+动态配置示例：
+
+```text
+GET /api/v1/gbm/dcc/update_config?key=downgradeSwitch&value=1
+GET /api/v1/gbm/dcc/update_config?key=cutRange&value=0
+GET /api/v1/gbm/dcc/update_config?key=rateLimiterSwitch&value=close
+```
+
+## 本地启动
 
 ### 1. 环境要求
 
-| 依赖 | 版本 | 备注 |
-| --- | --- | --- |
-| JDK | **8** | 必须为 8，JDK 21 下编译会失败 |
-| Maven | 3.9+ | — |
-| MySQL | 8.0 | 亦可用仓库内的 Docker Compose 起库 |
+- JDK 8、17 或 21
+- Maven 3.9+
+- MySQL 8.0
+- Redis 6+
+- RabbitMQ 3.12，端到端验证 MQ 回调时需要
 
 ### 2. 初始化数据库
 
 ```bash
-mysql -u root -p < docs/dev-ops/mysql/sql/group_buy_market.sql
+mysql --host=127.0.0.1 --port=3306 --user=root -p \
+  --default-character-set=utf8mb4 \
+  < docs/dev-ops/mysql/sql/2-29-group_buy_market.sql
 ```
 
-脚本包含 `CREATE DATABASE`，会创建 `group_buy_market` 库、两张表，并插入一条测试折扣数据。
+脚本会创建 `group_buy_market` 数据库、10 张表，并写入可重复使用的演示数据。
 
-### 3. 配置数据库连接
-
-仓库只提供配置模板，先复制再填写自己的账号密码：
+### 3. 配置本地连接
 
 ```bash
 cp group-buy-market-app/src/main/resources/application-dev.yml.example \
    group-buy-market-app/src/main/resources/application-dev.yml
 ```
 
-然后编辑 `application-dev.yml`，确认数据库地址、库名与账号密码正确：
+支持以下环境变量覆盖：
 
-```yaml
-spring:
-  datasource:
-    username: root
-    password: your_password
-    url: jdbc:mysql://127.0.0.1:3306/group_buy_market?useUnicode=true&characterEncoding=utf8&autoReconnect=true&zeroDateTimeBehavior=convertToNull&serverTimezone=Asia/Shanghai&useSSL=true
-```
+| 变量 | 默认值 |
+| --- | --- |
+| `MYSQL_HOST` / `MYSQL_PORT` | `127.0.0.1` / `3306` |
+| `MYSQL_DATABASE` | `group_buy_market` |
+| `MYSQL_USERNAME` / `MYSQL_PASSWORD` | `root` / 配置模板中的占位值 |
+| `REDIS_HOST` / `REDIS_PORT` | `127.0.0.1` / `6379` |
+| `RABBITMQ_ADDRESS` / `RABBITMQ_PORT` | `127.0.0.1` / `5672` |
+| `RABBITMQ_USERNAME` / `RABBITMQ_PASSWORD` | `guest` / 配置模板中的占位值 |
 
-> `application-dev.yml` 已被 `.gitignore` 忽略，不会被提交，可放心填写真实密码。
+### 4. 启动应用
 
-### 4. 编译与启动
+在 IDEA 中将 Project SDK 设置为 JDK 8 或更高版本，运行 `com.groupbuy.market.Application`。
 
-```bash
-# 编译（须在 JDK 8 环境下）
-export JAVA_HOME=/path/to/jdk8
-mvn clean compile
-
-# 启动应用，默认端口 8091
-mvn -pl group-buy-market-app -am spring-boot:run
-```
-
-也可以直接在 IDEA 中打开根 `pom.xml`，将 **Project SDK 设为 1.8**，运行 `group-buy-market-app` 下的 `Application.java`。看到日志输出 `Started Application in ... seconds` 即启动成功。
-
-打包运行：
+命令行方式：
 
 ```bash
 mvn clean package -DskipTests
 java -jar group-buy-market-app/target/group-buy-market-app.jar
 ```
 
-### 5. 验证
+启动成功后访问：
 
-```bash
-# 跑数据层测试，确认 DAO 与数据库连接正常
-mvn test -pl group-buy-market-app -am \
-  -DskipTests=false -DfailIfNoTests=false \
-  -Dtest=GroupBuyActivityDaoTest,GroupBuyDiscountDaoTest
+```text
+http://127.0.0.1:8091/actuator/health
 ```
 
-测试位于 `group-buy-market-app/src/test/java/com/groupbuy/market/test/infrastructure/dao/`，会打印两张表的查询结果。
+### 5. Docker 启动依赖
 
-> 工程默认跳过单元测试（根 pom 的 `skipTests` 默认为 `true`），跑测试时需显式加 `-DskipTests=false`。也可以直接在 IDEA 中右键运行这两个测试类。
+`docs/dev-ops/docker-compose-environment.yml` 提供 MySQL、Redis、RabbitMQ 和管理页面。
 
-## Docker 部署
-
-仓库提供了一套容器化配置，对应教程后期的「部署上线」章节。学习调试阶段建议本地直连 MySQL，不必启用。
-
-| 文件 | 用途 |
-| --- | --- |
-| `docs/dev-ops/docker-compose-environment.yml` | 一键起 MySQL(13306)、Redis(16379)、phpMyAdmin(8899)、Redis 管理台(8081) |
-| `group-buy-market-app/Dockerfile`、`build.sh` | 构建应用镜像 |
-| `docs/dev-ops/docker-compose-app.yml` | 以镜像方式运行应用 |
-| `docs/dev-ops/app/start.sh`、`stop.sh` | 容器启停脚本 |
+先在本地复制环境变量模板并修改占位值：
 
 ```bash
-# 启动依赖环境
-docker compose -f docs/dev-ops/docker-compose-environment.yml up -d
+cp docs/dev-ops/.env.example docs/dev-ops/.env
 ```
 
-> 注意：`docker-compose-environment.yml` 把 MySQL 映射到宿主机 **13306** 端口，而 `application-dev.yml` 默认连 **3306**，两者不一致。启用 Docker 环境后需同步修改配置端口或调整 compose 的端口映射。
-
-## 开发计划
-
-- [x] DDD 六模块工程骨架
-- [x] 拼团活动、折扣配置的数据层与单元测试
-- [ ] HTTP 接口层：拼团活动查询、试算入口
-- [ ] 领域层：优惠试算的聚合与领域服务
-- [ ] 引入 Redis，实现成团缓存与库存锁定
-- [ ] 责任链模式重构折扣计算，支持多营销玩法叠加
-- [ ] 消息驱动：成团通知、超时退单
-
-## 常见问题
-
-**必须用 JDK 8 吗？**
-
-是的。根 `pom.xml` 锁定了 `maven-compiler-plugin 3.0`，在 JDK 21 下会报 `NoSuchFieldError: JCTree$JCImport.qualid`。编译前请把 `JAVA_HOME` 切到 JDK 8，或在 IDEA 的 Project SDK 中指定 1.8。
-
-**Git Bash 里 `mvn` 报 `ClassNotFoundException: plexus.classworlds.launcher.Launcher`？**
-
-这是 MSYS 路径转换被禁用导致的：环境变量 `MSYS_NO_PATHCONV` 与 `MSYS2_ARG_CONV_EXCL` 会让 Maven 脚本生成的 POSIX 路径原样传给 Windows 的 `java.exe`，从而加载不到 jar。与 `JAVA_HOME` 是否含空格无关。
+然后启动依赖：
 
 ```bash
-# 临时绕过
-( unset MSYS_NO_PATHCONV MSYS2_ARG_CONV_EXCL; mvn clean compile )
+docker compose --env-file docs/dev-ops/.env -f docs/dev-ops/docker-compose-environment.yml up -d
 ```
 
-或在 `~/.bashrc` 中加一个只作用于 mvn 的包装函数：
+容器端口与本地应用配置不同，启动应用时需要把 `MYSQL_PORT`、`REDIS_PORT` 等变量设置为模板中对应端口。RabbitMQ 管理页面位于 `http://127.0.0.1:15672`，账号和密码取自本地 `.env`。
+
+`.env` 已被忽略，只会在本机生效；不要提交真实密码、令牌或云服务密钥。
+
+## 测试
+
+测试会修改订单状态，重复执行前建议重新导入初始化 SQL。
 
 ```bash
-mvn() {
-  ( unset MSYS_NO_PATHCONV MSYS2_ARG_CONV_EXCL; command mvn "$@" )
-}
+mvn test -DskipTests=false \
+  -Dspring.rabbitmq.listener.simple.auto-startup=false
 ```
 
-**应用启动后访问 8091 返回 404？**
+当前测试覆盖营销试算、锁单、结算、三种退款路径、DAO、Redis 锁、责任链、MQ 端口探测、HTTP 回调和 Controller。
 
-正常。当前阶段尚未实现任何 Controller，启动日志出现 `Started Application` 即代表工程正常。
+## 注意事项
 
-## 参考与致谢
-
-
-
-## License
-
-[Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0)
-
-
+- 项目源码和字节码目标为 Java 8，可使用 JDK 8、17 或 21 构建。
+- 根 POM 默认跳过测试，执行测试时必须显式添加 `-DskipTests=false`。
+- RabbitMQ 未启动时可以运行应用和大部分测试，但异步通知会进入本地任务重试。
+- 未启动 Logstash 时，`127.0.0.1:4560` 的连接警告不影响业务和测试结果。
+- Redis 管理页面：`http://127.0.0.1:8081`；phpMyAdmin：`http://127.0.0.1:8899`。

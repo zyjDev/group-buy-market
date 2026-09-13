@@ -52,6 +52,10 @@ data/
 /data/
 /data/*
 /group-buy-market-app/data/
+/data/log/
+/group-buy-market-app/data/log/
+hs_err_pid*
+replay_pid*
 
 ### 系统与编辑器垃圾文件 ###
 .DS_Store
@@ -63,14 +67,48 @@ Desktop.ini
 ### 本地敏感配置 ###
 # 含数据库账号密码，不提交；请参考 application-dev.yml.example 自建该文件
 group-buy-market-app/src/main/resources/application-dev.yml
+group-buy-market-app/src/main/resources/application-*.local.yml
 # 本地环境变量与密钥
 .env
 *.env
+.env.*
+!.env.example
+application-local.yml
+*.pem
+*.key
+*.p12
+*.jks
+*.keystore
+credentials.json
+service-account*.json
 *-secret.yml
+*-secret.yaml
 
 ### 本地交接文档（仅本机查看，不推送到远程）###
 HANDOVER.md
 *.local.md
+*.personal.md
 
 ### IDE 配置备份目录（含数据源与本地凭据，不提交）###
 .idea.bak*/
+
+### 历史归档与第三方运行配置（含凭据，不提交）###
+/docs/tag/
+/docs/dev-ops/sql-bak/
+/docs/dev-ops/grafana/
+/docs/dev-ops/mysql/sql/grafana.sql
+/docs/dev-ops/mysql/sql/group_buy_market.sql
+/docs/dev-ops/docker-compose-*-aliyun.yml
+**/natapp/
+**/natapp.exe
+
+### 本地备份与临时文件 ###
+*.bak
+*.old
+*.sql.bak
+*.zip
+*.7z
+*.rar
+*.tar
+*.tar.gz
+*.tgz
