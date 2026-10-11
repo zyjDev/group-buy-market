@@ -112,3 +112,5 @@ HANDOVER.md
 *.tar
 *.tar.gz
 *.tgz
+
+.workbuddy-ai
