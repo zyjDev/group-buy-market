@@ -381,30 +381,28 @@ public class TradeRepository implements ITradeRepository {
      */
     @Override
     public boolean occupyTeamStock(String teamStockKey, String recoveryTeamStockKey, Integer target, Integer validTime) {
-        // 失败恢复量
+        // 失败恢复量（独立 key，仅做只读参考，避免进入 Lua 造成 Redis Cluster 跨 slot）
         Long recoveryCount = redisService.getAtomicLong(recoveryTeamStockKey);
         recoveryCount = null == recoveryCount ? 0 : recoveryCount;
 
-        // 1. incr 得到值，与总量和恢复量做对比。恢复量为系统失败时候记录的量。
-        // 2. 从有组队量开始，相当于已经有了一个占用量，所以要 +1
-        long occupy = redisService.incr(teamStockKey) + 1;
+        // 原子抢占：INCR -> 比较上限 -> 超限回滚；返回占用槽位号(>0)，失败返回 -1。
+        // 关键竞态（读-改-写）在单条 Lua 中原子完成，杜绝并发超卖。
+        long occupy = redisService.atomicOccupy(teamStockKey, (long) target + recoveryCount);
+        if (occupy < 0) {
+            return false;
+        }
 
-        if (occupy > target + recoveryCount) {
-            // 超出库存限制时，需要将已经增加的库存减回去，避免库存泄漏
+        // 兜底锁：防止极端情况下 incr 返回重复值导致槽位被重复占用（原 setNx 逻辑）。
+        // 仅在 Lua 抢占成功后执行，失败则回滚计数，避免库存计数泄漏。
+        String lockKey = teamStockKey + Constants.UNDERLINE + occupy;
+        Boolean lock = redisService.setNx(lockKey, validTime + 60, TimeUnit.MINUTES);
+        if (!lock) {
+            log.warn("组队库存加锁失败，回滚库存计数 {}", lockKey);
             redisService.decr(teamStockKey);
             return false;
         }
 
-        // 1. 给每个产生的值加锁为兜底设计，虽然incr操作是原子的，基本不会产生一样的值。但在实际生产中，遇到过集群的运维配置问题，以及业务运营配置数据问题，导致incr得到的值相同。
-        // 2. validTime + 60分钟，是一个延后时间的设计，让数据保留时间稍微长一些，便于排查问题。
-        String lockKey = teamStockKey + Constants.UNDERLINE + occupy;
-        Boolean lock = redisService.setNx(lockKey, validTime + 60, TimeUnit.MINUTES);
-
-        if (!lock) {
-            log.info("组队库存加锁失败 {}", lockKey);
-        }
-
-        return lock;
+        return true;
     }
 
     @Override
@@ -613,8 +611,8 @@ public class TradeRepository implements ITradeRepository {
         // 使用orderId作为锁的key，避免同一订单重复恢复库存
         String lockKey = "refund_lock_" + orderId;
         
-        // 尝试获取分布式锁，防止重复操作 30天过期
-        Boolean lockAcquired = redisService.setNx(lockKey, 30 * 24 * 60 * 60 * 1000L, TimeUnit.MINUTES);
+        // 尝试获取分布式锁，防止重复操作，过期时间 30 天（单位修正为 MILLISECONDS；原 MINUTES 会使锁约等于 4931 年不释放，造成 key 堆积）
+        Boolean lockAcquired = redisService.setNx(lockKey, 30L * 24 * 60 * 60 * 1000, TimeUnit.MILLISECONDS);
         
         if (!lockAcquired) {
             log.warn("订单 {} 恢复库存操作已在进行中，跳过重复操作", orderId);

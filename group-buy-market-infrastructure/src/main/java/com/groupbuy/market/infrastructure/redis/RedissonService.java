@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.time.Duration;
+import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -174,6 +175,34 @@ public class RedissonService implements IRedisService {
     @Override
     public Boolean setNx(String key, long expired, TimeUnit timeUnit) {
         return redissonClient.getBucket(key).trySet("lock", expired, timeUnit);
+    }
+
+    /**
+     * 原子抢占库存 Lua 脚本：
+     * local cur = redis.call('INCR', KEYS[1])
+     * local occupy = cur + 1
+     * if occupy > tonumber(ARGV[1]) then redis.call('DECR', KEYS[1]) return -1 end
+     * return occupy
+     */
+    private static final String OCCUPY_TEAM_STOCK_LUA =
+            "local cur = redis.call('INCR', KEYS[1])\n" +
+            "local occupy = cur + 1\n" +
+            "if occupy > tonumber(ARGV[1]) then\n" +
+            "  redis.call('DECR', KEYS[1])\n" +
+            "  return -1\n" +
+            "end\n" +
+            "return occupy";
+
+    @Override
+    public long atomicOccupy(String teamStockKey, long limit) {
+        // 仅操作单个 key，满足 Redis Cluster 单 slot 约束，无 CROSSSLOT 风险
+        Long result = redissonClient.getScript().eval(
+                RScript.Mode.READ_WRITE,
+                OCCUPY_TEAM_STOCK_LUA,
+                RScript.ReturnType.INTEGER,
+                Collections.<Object>singletonList(teamStockKey),
+                limit);
+        return result == null ? -1L : result;
     }
 
     @Override

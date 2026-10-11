@@ -270,6 +270,15 @@ public interface IRedisService {
 
     Boolean setNx(String key, long expired, TimeUnit timeUnit);
 
+    /**
+     * 原子抢占组队库存（单条 Lua 执行）：INCR -> 比较上限 -> 超限 DECR 回滚并返回 -1；否则返回占用槽位号(>0)。
+     *
+     * @param teamStockKey 库存计数 key
+     * @param limit        允许的最大 occupy 值（target + recoveryCount）
+     * @return 占用成功的槽位号(>0)，超限或失败返回 -1
+     */
+    long atomicOccupy(String teamStockKey, long limit);
+
     RBitSet getBitSet(String key);
 
     default int getIndexFromUserId(String userId) {
